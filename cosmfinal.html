@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>Rank Correlation Coefficient Calculator</title>
+
+<style>
+
+body{
+font-family: Arial;
+background: linear-gradient(135deg, cyan, #00bcd4);
+text-align:center;
+padding:40px;
+}
+
+.container{
+background:white;
+padding:25px;
+border-radius:10px;
+width:1000px;
+margin:auto;
+box-shadow:0 10px 20px rgba(0,0,0,0.3);
+}
+
+h1{
+color:#008b8b;
+}
+
+input{
+padding:7px;
+margin:5px;
+width:100px;
+text-align:center;
+border:1px solid #ccc;
+border-radius:4px;
+}
+
+button{
+padding:10px 20px;
+margin:10px;
+border:none;
+background:cyan;
+color:black;
+font-weight:bold;
+border-radius:5px;
+cursor:pointer;
+}
+
+button:hover{
+background:#00e5ff;
+}
+
+table{
+margin:auto;
+margin-top:20px;
+border-collapse:collapse;
+width:100%;
+}
+
+th,td{
+border:1px solid #ddd;
+padding:8px;
+}
+
+th{
+background:cyan;
+color:black;
+font-weight:bold;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Rank Correlation Coefficient</h1>
+
+<label>Enter Number of Items:</label>
+<input id="n" type="number">
+
+<button onclick="createTable()">Create Input Table</button>
+
+<div id="inputArea"></div>
+<div id="result"></div>
+
+</div>
+
+<script>
+
+function createTable(){
+
+let n=document.getElementById("n").value
+
+let html="<table>"
+html+="<tr><th>Name</th><th>X Value</th><th>Y Value</th></tr>"
+
+for(let i=0;i<n;i++){
+
+html+=`
+<tr>
+<td><input class="name"></td>
+<td><input type="number" class="x"></td>
+<td><input type="number" class="y"></td>
+</tr>
+`
+
+}
+
+html+="</table>"
+html+="<button onclick='calculate()'>Calculate</button>"
+
+document.getElementById("inputArea").innerHTML=html
+
+}
+
+function rank(arr){
+
+let sorted=[...arr].sort((a,b)=>b-a)
+return arr.map(v=>sorted.indexOf(v)+1)
+
+}
+
+function calculate(){
+
+let names=document.querySelectorAll(".name")
+let xInputs=document.querySelectorAll(".x")
+let yInputs=document.querySelectorAll(".y")
+
+let name=[]
+let x=[]
+let y=[]
+
+for(let i=0;i<xInputs.length;i++){
+
+name.push(names[i].value)
+x.push(Number(xInputs[i].value))
+y.push(Number(yInputs[i].value))
+
+}
+
+let rx=rank(x)
+let ry=rank(y)
+
+let d=[]
+let d2=[]
+let sum=0
+
+for(let i=0;i<x.length;i++){
+
+let diff=rx[i]-ry[i]
+let sq=diff*diff
+
+d.push(diff)
+d2.push(sq)
+
+sum+=sq
+
+}
+
+let n=x.length
+
+let m=0
+let cf=(1/12)*(m*m*m-m)
+
+let p=1-(6*(sum+cf))/(n*n*n-n)
+
+let html="<h2>Calculation Table</h2>"
+
+html+=`
+<table>
+<tr>
+<th>Name</th>
+<th>X</th>
+<th>R(x)</th>
+<th>Y</th>
+<th>R(y)</th>
+<th>D</th>
+<th>D²</th>
+</tr>
+`
+
+for(let i=0;i<n;i++){
+
+html+=`
+<tr>
+<td>${name[i]}</td>
+<td>${x[i]}</td>
+<td>${rx[i]}</td>
+<td>${y[i]}</td>
+<td>${ry[i]}</td>
+<td>${d[i]}</td>
+<td>${d2[i]}</td>
+</tr>
+`
+
+}
+
+html+="</table>"
+
+html+=`
+<h3>ΣD² = ${sum}</h3>
+<h3>Correlation Factor = ${cf}</h3>
+<h2>Rank Correlation Coefficient (p) = ${p.toFixed(3)}</h2>
+`
+
+document.getElementById("result").innerHTML=html
+
+}
+
+</script>
+
+</body>
+</html>
